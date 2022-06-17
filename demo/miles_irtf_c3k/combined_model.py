@@ -50,18 +50,18 @@ class CombinedInterpolator(SimpleSPIModel):
                 # if training log(flux), use relative (S/N)**2 for weights
                 relative_weights = self.training_snr[:, ind_wave]**2
             else:
-                # else just use the inverse flux variance (S/N)**2 /S**2 
+                # else just use the inverse flux variance (S/N)**2 /S**2
                 relative_weights = (self.training_snr[:, ind_wave] / spec)**2
 
             # --- do relative weighting of c3k ---
             c3k = (self.training_labels['miles_id'] == 'c3k')
-            # median of MILES weights.  If zero, just give c3k full weight 
+            # median of MILES weights.  If zero, just give c3k full weight
             wmiles = np.nanmedian(relative_weights[~c3k, :], axis=0)
             wmiles[wmiles == 0.] = 1.0
             relative_weights[c3k, :] = (wmiles * self.c3k_weight)[None, :]
-                      
+
             return relative_weights
-        
+
     def build_training_info(self):
         self.reference_index = None
         self.reference_spectrum = self.training_spectra.std(axis=0)
@@ -70,7 +70,8 @@ class CombinedInterpolator(SimpleSPIModel):
         """Returns a boolean array of same length as secondary describing
         whether that element of secondary is outside the hull formed by primary
         """
-        c3k = self.training_labels['miles_id'] == 'c3k'
+
+        c3k = self.training_labels['miles_id'] == 'c3k'.encode('utf-8')
         miles = ~c3k
         L = flatten_struct(self.training_labels[miles], use_labels=self.used_labels)
         l = flatten_struct(self.training_labels[c3k], use_labels=self.used_labels)

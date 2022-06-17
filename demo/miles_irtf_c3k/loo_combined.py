@@ -93,7 +93,7 @@ def loo(regime='Warm Giants', outroot=None, nbox=-1, plotspec=True, **kwargs):
     # --- Build models ----
 
     psi = get_interpolator(regime=regime, **kwargs)
-    clibname = '/Users/bjohnson/Codes/SPS/ckc/ckc/lores/irtf/ckc14_irtf.flat.h5'
+    clibname = '/Users/alexawork/Documents/StellarLibraryDB/CKC_models/c3k_v1.3_R10K.h5'
     c3k_model = PiecewiseC3K(libname=clibname, use_params=['logt', 'logg', 'feh'],
                              verbose=False, n_neighbors=1, log_interp=True,
                              rescale_libparams=False, in_memory=True)
@@ -104,7 +104,11 @@ def loo(regime='Warm Giants', outroot=None, nbox=-1, plotspec=True, **kwargs):
     # These are the indices in the full library of the training spectra
     loo_indices = psi.training_indices.copy()
     # Only leave out MILES
-    miles = psi.training_labels['miles_id'] != 'c3k'
+
+
+    miles = psi.training_labels['miles_id'] != 'c3k'.encode('utf-8')
+
+    print(loo_indices[miles].shape)
     loo_indices = loo_indices[miles]
     # Now do the leave out, with or without retraining
     psi, predicted, inhull = leave_one_out(psi, loo_indices, **kwargs)
@@ -166,7 +170,7 @@ def run_matrix(**run_params):
     c3k_weight = [1e-9, 1e-3, 1e-2]
 
     for regime, wght, fake_unc in product(regimes, c3k_weight, fake_weights):
-        outroot = 'results/figures_v5b/{}_unc={}_cwght={:04.3f}'.format(regime.replace(' ','_'),
+        outroot = 'EIRTFv1_results/{}_unc={}_cwght={:04.3f}'.format(regime.replace(' ','_'),
                                                     not fake_unc, wght)
         _ = loo(regime=regime, c3k_weight=wght, fake_weights=fake_unc, outroot=outroot, **run_params)
 
@@ -183,7 +187,8 @@ if __name__ == "__main__":
                   'tpad': 500.0, 'gpad': 0.25, 'zpad': 0.1,
                   'snr_max': 300,
                   'mask_mann': False,
-                  'mlib': '/Users/bjohnson/Projects/spi/data/combined/culled_libv5_w_mdwarfs_w_unc_w_allc3k.h5',
+                  'mlib': '/Users/alexawork/Documents/PSITables/culled_libvtest_w_mdwarfs_w_unc_w_allc3k.h5',
+                  #'mlib': '/Users/alexawork/Documents/StellarLibraryDB/eirtf_v2_w_mdwarfs_w_unc_w_allc3k.h5',
                   'snr_threshold': 1e-10,
                   'nbox': -1,
                   }
