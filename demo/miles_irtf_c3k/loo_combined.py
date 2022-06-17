@@ -108,7 +108,6 @@ def loo(regime='Warm Giants', outroot=None, nbox=-1, plotspec=True, **kwargs):
 
     miles = psi.training_labels['miles_id'] != 'c3k'.encode('utf-8')
 
-    print(loo_indices[miles].shape)
     loo_indices = loo_indices[miles]
     # Now do the leave out, with or without retraining
     psi, predicted, inhull = leave_one_out(psi, loo_indices, **kwargs)
