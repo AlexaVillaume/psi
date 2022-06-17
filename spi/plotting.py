@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as pl
 from matplotlib.backends.backend_pdf import PdfPages
 
+import h5py
+
 from .utils import dict_struct
 
 __all__ = ["get_stats", "bias_variance", "quality_map",
@@ -30,7 +32,7 @@ def get_stats(wave, observed, predicted, snr,
     var_spectrum = np.nanvar(delta, axis=0)
     bias_spectrum = np.nanmean(delta, axis=0)
     var_total = np.nanvar(delta[:, imin:imax], axis=1)
-    
+
     chi_bias_spectrum = np.nanmean(chi, axis=0)
     chi_var_spectrum = np.nanvar(chi, axis=0)
     chisq = np.nansum((chi**2)[:,imin:imax], axis=1)
@@ -61,7 +63,7 @@ def specpages(filename, wave, pred, obs, unc, labels,
         inbounds = np.ones(len(labels), dtype=bool)
     if inhull is None:
         inhull = np.ones(len(labels), dtype=bool)
-        
+
     with PdfPages(filename) as pdf:
         for i, (l, p, o, u) in enumerate(zip(labels, pred, obs, unc)):
             if (not inbounds[i]) and (show_outbounds is False):
@@ -90,7 +92,7 @@ def specpages(filename, wave, pred, obs, unc, labels,
 
 def zoom_lines(wave, predicted, observed, uncertainties=None,
                c3k=None, show_native=True, showlines={}, figsize=None):
-    """Plot several spectra on a 
+    """Plot several spectra on a
     """
     # Set up figure
     props = dict(boxstyle='round', facecolor='w', alpha=0.5)
@@ -103,7 +105,7 @@ def zoom_lines(wave, predicted, observed, uncertainties=None,
 
     # set up to hold stats
     meanrms = np.zeros([nline, 2])
-    
+
     for i, (line, (lo, hi)) in enumerate(showlines.items()):
         if nline > 1:
             ax = axes.flat[i]
@@ -142,15 +144,15 @@ def zoom_lines(wave, predicted, observed, uncertainties=None,
             ax.text(0.05, 0.20, label,
                 transform=ax.transAxes, fontsize=8,
                 verticalalignment='top', bbox=props)
-            
-        
+
+
         if i == 0:
             ax.legend(loc=0, prop={'size':8})
         pl.setp(ax.xaxis.get_majorticklabels(), rotation=35,
                         horizontalalignment='center')
     return fig, axes, meanrms
 
-        
+
 def bias_variance(wave, bias, sigma, qlabel='\chi'):
     colors = [p['color'] for p in pl.rcParams['axes.prop_cycle']]
     sfig, sax = pl.subplots()
@@ -174,7 +176,7 @@ def quality_map(labels, quality, quality_label, add_offsets=0.0, **extras):
     ranges = dict([(l, labels[l].max() - labels[l].min()) for l in [l1, l2, l3]])
     mapfig, mapaxes = pl.subplots(1, 2, figsize=(12.5,7))
 
-    
+
     rr = add_offsets * np.random.uniform(0, 1, size=len(lab))
     unit_coord = dict([(l, labels[l] / ranges[l]) for l in ["logt", "logg", "feh"]])
 
@@ -191,7 +193,7 @@ def quality_map(labels, quality, quality_label, add_offsets=0.0, **extras):
     #cbar.ax.set_ylabel('Fractional RMS (%)')
     cbar.ax.set_ylabel(quality_label)
     [ax.invert_xaxis() for ax in mapaxes]
-    return mapfig, mapaxes              
+    return mapfig, mapaxes
 
 
 def plot_best_worst(psi, libindices, predicted, metric, nshow=5):
@@ -232,7 +234,7 @@ def flux_teff(psi, nt=500, nw=5, showgrid=False):
     feh = np.zeros(nt) + np.median(psi.training_labels['feh'])
     logt = np.linspace(psi.training_labels['logt'].min(), psi.training_labels['logt'].max(), nt)
     spec, covered = psi.get_star_spectrum(logt=logt, logg=logg, feh=feh, check_coverage=True)
-    
+
     inds = (np.linspace(0, len(psi.wavelengths), nw+2)[1:-1]).astype(int)
     for j, i in enumerate(inds):
         ax.plot(logt, spec[covered, i], 'o', label='$\lambda={}$'.format(psi.wavelengths[i]))
@@ -256,7 +258,7 @@ def show_fit_slice(psi, param, n=500, nw=5, waves=None, showgrid=True, **kwargs)
     :param psi: A trained interpolator
 
     :param param:
-        The name of the parameter forming the slice.  
+        The name of the parameter forming the slice.
         One of "logt" | "logg" | "feh"
 
     :param n: number of points along the slice
@@ -264,7 +266,7 @@ def show_fit_slice(psi, param, n=500, nw=5, waves=None, showgrid=True, **kwargs)
     :param nw: number of wavelength points to show
 
     :param showgrid:
-        If True, show the grid on top of the predictions. 
+        If True, show the grid on top of the predictions.
         Only works if the training set is actually a grid.
 
     :param kwargs: (optional)
