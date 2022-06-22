@@ -16,7 +16,6 @@ from combined_params import bounds, features, pad_bounds
 
 
 def cumulative_all(types):
-    fname = 'spi_cumulative_rms_jacknife.pdf'
 
     regimes = {'Cool Dwarfs': ['#CC3333', '-'],
                'Cool Giants': ['#FF6600', '--'],
@@ -29,6 +28,7 @@ def cumulative_all(types):
 
     for i, (ax, t) in enumerate(zip(axes, types)):
         for d in t:
+            print(d)
             with h5py.File(d, 'r') as hf:
 
                 ## I need to learn how to use regex
@@ -37,9 +37,9 @@ def cumulative_all(types):
                 if i == 0:
                     regime = tmp2.replace('_unc=True_cwght=0.000_results.h5','')
                 elif i == 1:
-                    regime = tmp2.replace('_unc=True_cwght=0.010_results.h5','')
-                elif i == 2:
                     regime = tmp2.replace('_unc=True_cwght=0.001_results.h5','')
+                elif i == 2:
+                    regime = tmp2.replace('_unc=True_cwght=0.010_results.h5','')
                 regime = regime.replace('_', ' ')
 
                 wave = np.array(hf['wavelengths'])
@@ -97,10 +97,14 @@ def cumulative_all(types):
         ax.set_xlabel('Fractional RMS (%)', fontsize=14)
 
     axes[0].set_ylabel('%(<RMS)', fontsize=14)
-    axes[0].legend(frameon=False, loc='lower right', fontsize=12)
+    axes[0].legend(frameon=True, loc='lower left', fontsize=12)
     plt.tight_layout()
 
     plt.suptitle('Jack knife tests')
+
+    fname = 'spi_cumulative_rms_jacknife.pdf'
+
+    plt.tight_layout()
     plt.savefig(fname)
 
     plt.show()
