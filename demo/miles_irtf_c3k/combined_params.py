@@ -15,13 +15,13 @@ def pad_bounds(inbounds, tpad=500., gpad=0.5, zpad=0.1, **extras):
 
 bounds['Cool Giants'] = {'logt': (3.4, np.log10(4000.0)),
                          'logg': (-0.5, 2.25),
-                         'feh': (-2.501, 0.5)}
-# Teff <= 4000, logg <= 3.5 
+                         'feh': (-4., 0.5)}
+# Teff <= 4000, logg <= 3.5
 features['Cool Giants'] = (['logt'],
                            ['feh'],
                            ['logg'],
                            # quadratic
-                           ['logt', 'logt'], 
+                           ['logt', 'logt'],
                            ['logg', 'logg'],
                            ['feh', 'feh'],
                            # cross quadratic
@@ -58,10 +58,10 @@ features['Cool Giants'] = (['logt'],
                            )
 
 # Cool Dwarfs
-# Teff <= 4000, logg > 3.5 
+# Teff <= 4000, logg > 3.5
 bounds['Cool Dwarfs'] = {'logt': (3.4, np.log10(4000.0)),
                          'logg': (3.999, 6),
-                         'feh': (-2.501, 0.5)}
+                         'feh': (-4., 0.5)}
 features['Cool Dwarfs'] = (['logt'],
                            ['feh'],
                            ['logg'],
@@ -94,10 +94,10 @@ features['Cool Dwarfs'] = (['logt'],
 
 # Warm Giants
 # 4000 < Teff <= 6500, logg <= 3.5
-# should also remove very warm low-gravity C3K 
+# should also remove very warm low-gravity C3K
 bounds['Warm Giants'] = {'logt': (np.log10(4000.0), np.log10(6000)),
                          'logg': (-0.25, 3.501),
-                         'feh': (-2.501, 0.5)}
+                         'feh': (-4, 0.5)}
 features['Warm Giants'] = (['logt'],
                            ['feh'],
                            ['logg'],
@@ -133,7 +133,7 @@ features['Warm Giants'] = (['logt'],
 # 4000 < Teff <= 6500, logg > 3.5
 bounds['Warm Dwarfs'] = {'logt': (np.log10(4000.0), np.log10(6000)),
                          'logg': (3.4999, 5.25),
-                         'feh': (-2.501, 0.5)}
+                         'feh': (-4., 0.5)}
 features['Warm Dwarfs'] = (['logt'],
                            ['feh'],
                            ['logg'],
@@ -178,7 +178,7 @@ features['Warm Dwarfs'] = (['logt'],
 #Hot Stars
 bounds['Hot Stars'] = {'logt': (np.log10(6000), np.log10(12000.0)),
                          'logg': (2.999, 5.001),
-                         'feh': (-2.501, 0.5)}
+                         'feh': (-4., 0.5)}
 features['Hot Stars'] = (['logt'],
                           ['feh'],
                           ['logg'],

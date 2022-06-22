@@ -36,7 +36,7 @@ def get_interpolator(mlib='', regime='', c3k_weight=1e-1, snr_max=1e3,
         psi.library_snr[g] = 100
     # mask the Mann mdwarf stars for now
     if mask_mann:
-        mann = np.where(psi.library_labels['miles_id'] == 'mdwarf')[0]
+        mann = np.where(psi.library_labels['miles_id'] == 'mdwarf'.encode('utf-8'))[0]
         psi.leave_out(mann)
     #c3k = np.where(psi.library_labels['miles_id'] == 'c3k')[0]
     # Choose parameter regime and features
@@ -88,7 +88,7 @@ def loo(regime='Warm Giants', outroot=None, nbox=-1, plotspec=True, **kwargs):
         pdict= {'regime': regime.replace(' ','_'),
                 'unc': not kwargs['fake_weights']}
         pdict.update(**kwargs)
-        outroot = '{regime}_unc={unc}_cwght={c3k_weight:04.3f}'.format(**pdict)
+        outroot = 'EIRTFv2_results/{regime}_unc={unc}_cwght={c3k_weight:04.3f}'.format(**pdict)
 
     # --- Build models ----
 
@@ -103,9 +103,8 @@ def loo(regime='Warm Giants', outroot=None, nbox=-1, plotspec=True, **kwargs):
     ts = time.time()
     # These are the indices in the full library of the training spectra
     loo_indices = psi.training_indices.copy()
+
     # Only leave out MILES
-
-
     miles = psi.training_labels['miles_id'] != 'c3k'.encode('utf-8')
 
     loo_indices = loo_indices[miles]
@@ -162,6 +161,7 @@ def loo(regime='Warm Giants', outroot=None, nbox=-1, plotspec=True, **kwargs):
 
 
 def run_matrix(**run_params):
+
     from itertools import product
     nmiles = [78, 15, 68, 6, 35]
     regimes = ['Hot Stars', 'Warm Giants', 'Warm Dwarfs', 'Cool Giants', 'Cool Dwarfs']
@@ -169,7 +169,7 @@ def run_matrix(**run_params):
     c3k_weight = [1e-9, 1e-3, 1e-2]
 
     for regime, wght, fake_unc in product(regimes, c3k_weight, fake_weights):
-        outroot = 'EIRTFv1_results/{}_unc={}_cwght={:04.3f}'.format(regime.replace(' ','_'),
+        outroot = 'EIRTFv2_results/newfehbounds_{}_unc={}_cwght={:04.3f}'.format(regime.replace(' ','_'),
                                                     not fake_unc, wght)
         _ = loo(regime=regime, c3k_weight=wght, fake_weights=fake_unc, outroot=outroot, **run_params)
 
@@ -186,8 +186,8 @@ if __name__ == "__main__":
                   'tpad': 500.0, 'gpad': 0.25, 'zpad': 0.1,
                   'snr_max': 300,
                   'mask_mann': False,
-                  'mlib': '/Users/alexawork/Documents/PSITables/culled_libvtest_w_mdwarfs_w_unc_w_allc3k.h5',
-                  #'mlib': '/Users/alexawork/Documents/StellarLibraryDB/eirtf_v2_w_mdwarfs_w_unc_w_allc3k.h5',
+                  #'mlib': '/Users/alexawork/Documents/PSITables/culled_libvtest_w_mdwarfs_w_unc_w_allc3k.h5',
+                  'mlib': '/Users/alexawork/Documents/StellarLibraryDB/eirtf_v2_w_mdwarfs_w_unc_w_allc3k.h5',
                   'snr_threshold': 1e-10,
                   'nbox': -1,
                   }
@@ -195,6 +195,9 @@ if __name__ == "__main__":
     if test:
         print('Test mode')
         psi, inds, pred = loo(regime='Warm Dwarfs', c3k_weight=1e-3, fake_weights=False,
-                              outroot='test', **run_params)
+                              outroot=None, **run_params)
     else:
         run_matrix(**run_params)
+
+
+
