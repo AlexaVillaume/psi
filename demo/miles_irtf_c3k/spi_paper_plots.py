@@ -22,11 +22,10 @@ def cumulative_all(types):
                'Cool Giants': ['#FF6600', '--'],
                'Warm Dwarfs': ['#006633','-.'],
                'Warm Giants': ['#66CC00', ':'],
-               'Hot Stars': ['#000099', '-']}
+               'Hot Stars':   ['#000099', '-']}
 
     fig = plt.figure(figsize=(12,4))
     axes = [plt.subplot(1,3,1), plt.subplot(1,3,2), plt.subplot(1,3,3)]
-
 
     for i, (ax, t) in enumerate(zip(axes, types)):
         for d in t:
@@ -35,10 +34,14 @@ def cumulative_all(types):
                 ## I need to learn how to use regex
                 tmp = d.split('/')
                 tmp2 = tmp[len(tmp)-1]
-                regime = tmp2.replace('_unc=True_cwght=0.010_results.h5','')
-                if i == 2:
+                if i == 0:
                     regime = tmp2.replace('_unc=True_cwght=0.000_results.h5','')
+                elif i == 1:
+                    regime = tmp2.replace('_unc=True_cwght=0.010_results.h5','')
+                elif i == 2:
+                    regime = tmp2.replace('_unc=True_cwght=0.001_results.h5','')
                 regime = regime.replace('_', ' ')
+
                 wave = np.array(hf['wavelengths'])
                 observed = np.array(hf['observed'])
                 predicted = np.array(hf['predicted'])
@@ -74,14 +77,18 @@ def cumulative_all(types):
                         label=regime)
 
 
-        #if i == 1:
-        #    ax.annotate('No Mann+ 2015', xy=(1,0),
-        #                 xycoords='axes fraction', xytext=(0.95, 0.05),
-        #                 ha='right', va='bottom', fontsize=12)
-        #if i == 2:
-        #    ax.annotate('No C3K', xy=(1,0),
-        #                 xycoords='axes fraction', xytext=(0.95, 0.05),
-        #                 ha='right', va='bottom', fontsize=12)
+        if i == 0:
+            ax.annotate('C3K weight 0.000', xy=(1,0),
+                         xycoords='axes fraction', xytext=(0.95, 0.05),
+                         ha='right', va='bottom', fontsize=12)
+        if i == 1:
+            ax.annotate('C3K weight 0.001', xy=(1,0),
+                         xycoords='axes fraction', xytext=(0.95, 0.05),
+                         ha='right', va='bottom', fontsize=12)
+        if i == 2:
+            ax.annotate('C3K weight 0.010', xy=(1,0),
+                         xycoords='axes fraction', xytext=(0.95, 0.05),
+                         ha='right', va='bottom', fontsize=12)
 
         ax.axvline(5, lw=1, ls='--',color='#424242')
         ax.axhline(90, lw=1, ls='--',color='#424242')
@@ -93,115 +100,11 @@ def cumulative_all(types):
     axes[0].legend(frameon=False, loc='lower right', fontsize=12)
     plt.tight_layout()
 
-    plt.show()
-
-
-def training_set_look():
-    import read_mist_models as read_mist
-    fig = plt.figure(figsize=(12,8))
-
-    lib =  ('FullSpectrum/EIRTF_v2/'
-            'erirtfv2_w_mdwarfsv1.h5')
-
-    with h5py.File(lib, 'r') as hf:
-        print(hf.keys())
-        c3k = (np.array(hf['ancillary']['miles_id']) == 'c3k')
-        md  = (np.array(hf['ancillary']['miles_id']) == 'mdwarf')
-        lib = ((np.array(hf['ancillary']['miles_id']) != 'mdwarf') &
-               (np.array(hf['ancillary']['miles_id']) != 'c3k'))
-
-        print(hf['ancillary']['miles_id'] == 'mdwarf')
-
-        spectra = np.array(hf['spectra'])
-        #unc = np.array(hf['uncertainties'])
-        wave = np.array(hf['wavelengths'])
-        #names = np.array(hf['ancillary']['miles_id'])
-        #blah = np.array(hf['parameters']['name'])
-        feh = np.array(hf['parameters']['feh'])
-        #logl = np.array(hf['parameters']['logl'])
-        logg = np.array(hf['parameters']['logg'])
-        logt = np.array(hf['parameters']['teff'])
-
-
-    axes = [plt.subplot2grid((2,3), (0,0), rowspan=1, colspan=1),
-            plt.subplot2grid((2,3), (0,1), rowspan=1, colspan=1),
-            plt.subplot2grid((2,3), (0,2), rowspan=1, colspan=1),
-            plt.subplot2grid((2,3), (1,0), rowspan=1, colspan=1),
-            plt.subplot2grid((2,3), (1,1), rowspan=1, colspan=1)]
-
-    mets = [(0.25, 0.6,), (-0.1, 0.1,), (-0.7, -0.4,),
-            (-1.2, -0.8,), (-1.7, -1.3,)]
-
-    isochrone_path = ('../MistIsochrones/'
-                      'IRTF_Metallicities/')
-    #mist_files = glob.glob(isochrone_path + 'MIST*')
-    mist_files = ['MIST_iso_+0.25_linear.dat',
-                'MIST_iso_+0.00_linear.dat',
-                'MIST_iso_-0.50_linear.dat',
-                'MIST_iso_-1.00_linear.dat',
-                'MIST_iso_-1.50_linear.dat']
-
-
-    isos = []
-    for iso_file in mist_files:
-        isos.append(read_mist.ISO('{0}{1}'.format(isochrone_path, iso_file), verbose=False))
-
-    for ax, met, iso in zip(axes, mets, isos):
-        i = ((feh >  met[0]) & (feh < met[1]))
-
-        sub = (c3k & i)
-        #ax.plot(logt[sub], logg[sub], ls='None', marker='.',
-        #         ms=8, color='#A0A5A9', label='C3K')
-        sub = (md & i)
-        ax.plot(logt[sub], logg[sub], ls='None', marker='o',
-                ms=8, color='#7156A5', label='Mann+ 2015')
-        sub = (lib & i)
-        #ax.plot(logt[sub], logg[sub], ls='None', marker='o',
-        #        ms=8, color='#E32017', label='This work')
-
-        age = 3e9
-        i = iso.age_index(age)
-        j = np.where((iso.isos[i]['phase'] != 3) &
-                     (iso.isos[i]['phase'] != 4) &
-                     (iso.isos[i]['phase'] != 5) &
-                     (iso.isos[i]['phase'] != 6))
-        ax.plot(iso.isos[i]['log_Teff'][j], iso.isos[i]['log_g'][j],
-                lw=2, color='#A0A5A9', label='3 Gyr')
-
-        age = 13.5e9
-        i = iso.age_index(age)
-        j = np.where((iso.isos[i]['phase'] != 3) &
-                     (iso.isos[i]['phase'] != 4) &
-                     (iso.isos[i]['phase'] != 5) &
-                     (iso.isos[i]['phase'] != 6))
-        ax.plot(iso.isos[i]['log_Teff'][j], iso.isos[i]['log_g'][j],
-                lw=2, color='k', label='13.5 Gyr')
-
-        ax.set_xlim(4.0, 3.4)
-        ax.set_ylim(6, -0.5)
-
-        ax.annotate("{0}<[Fe/H]<{1}".format(met[0], met[1]),
-                     xy=(1,0), xycoords='axes fraction',
-                     xytext=(0.05, 0.05), ha='left', va='bottom', fontsize=14)
-        ax.tick_params(axis='both', which='major')
-        ax.ticklabel_format(style='plain')
-        ax.set_xlabel(r'log T$_{\rm eff}$ (K)', fontsize=14)
-
-    axes[0].set_ylabel(r'log $g$', fontsize=14)
-    axes[3].set_ylabel(r'log $g$', fontsize=14)
-    axes[4].legend(bbox_to_anchor=(1.8, 1.0), frameon=False, numpoints=1)
-
-    plt.tight_layout()
-
-    plt.show()
-    """
-    fname = 'psi_training.pdf'
+    plt.suptitle('Jack knife tests')
     plt.savefig(fname)
-    subprocess.call(["cp", fname,
-                     "../SPS_Plots/PSICheck"])
-    subprocess.call(["mv", fname,
-                     "../SPS_Plots/Paper/Figures"])
-    """
+
+    plt.show()
+
 
 def check_chromo_emm():
     cd = 'v8_test/Hot_Stars_unc=True_cwght=0.010_results.h5'
@@ -460,15 +363,13 @@ if __name__=='__main__':
     #check_chromo_emm()
     #sys.exit()
 
-    #training_set_look()
-    #sys.exit()
-
     #residual_look(real)
     #sys.exit()
 
 
-    eirtfv2_all = glob.glob('EIRTFv2_results/*0.010*h5')
+    eirtfv2_c3k0_000 = glob.glob('EIRTFv2_results/*0.000*h5')
+    eirtfv2_c3k0_001 = glob.glob('EIRTFv2_results/*0.001*h5')
+    eirtfv2_c3k0_010 = glob.glob('EIRTFv2_results/*0.010*h5')
 
-    cumulative_all([eirtfv2_all])
-    #cumulative_all([real, nomann, noc3k])
+    cumulative_all([eirtfv2_c3k0_000, eirtfv2_c3k0_001, eirtfv2_c3k0_010])
 
