@@ -176,8 +176,8 @@ features['Warm Dwarfs'] = (['logt'],
                            )
 
 #Hot Stars
-bounds['Hot Stars'] = {'logt': (np.log10(6000), np.log10(12000.0)),
-                         'logg': (2.999, 5.001),
+bounds['Hot Stars'] = {'logt': (np.log10(6000), np.log10(40000.0)),
+                         'logg': (2.999, 6),
                          'feh': (-4., 0.5)}
 features['Hot Stars'] = (['logt'],
                           ['feh'],
