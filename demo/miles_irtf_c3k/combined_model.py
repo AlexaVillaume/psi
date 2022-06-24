@@ -54,7 +54,7 @@ class CombinedInterpolator(SimpleSPIModel):
                 relative_weights = (self.training_snr[:, ind_wave] / spec)**2
 
             # --- do relative weighting of c3k ---
-            c3k = (self.training_labels['miles_id'] == 'c3k')
+            c3k = (self.training_labels['miles_id'] == 'c3k'.encode('utf-8'))
             # median of MILES weights.  If zero, just give c3k full weight
             wmiles = np.nanmedian(relative_weights[~c3k, :], axis=0)
             wmiles[wmiles == 0.] = 1.0
