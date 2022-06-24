@@ -28,7 +28,6 @@ def cumulative_all(types):
 
     for i, (ax, t) in enumerate(zip(axes, types)):
         for d in t:
-            print(d)
             with h5py.File(d, 'r') as hf:
 
                 ## I need to learn how to use regex
@@ -102,7 +101,8 @@ def cumulative_all(types):
 
     plt.suptitle('Jack knife tests')
 
-    fname = 'spi_cumulative_rms_jacknife.pdf'
+    fname = 'spi_cumulative_rms_jacknife_ckc+dMall_miles+irtf.forpsi.pdf'
+    #fname = 'spi_cumulative_rms_jacknife_c3k_v1.3_R10K.pdf'
 
     plt.tight_layout()
     plt.savefig(fname)
@@ -371,9 +371,13 @@ if __name__=='__main__':
     #sys.exit()
 
 
-    eirtfv2_c3k0_000 = glob.glob('EIRTFv2_results/*0.000*h5')
-    eirtfv2_c3k0_001 = glob.glob('EIRTFv2_results/*0.001*h5')
-    eirtfv2_c3k0_010 = glob.glob('EIRTFv2_results/*0.010*h5')
+    #eirtfv2_c3k0_000 = glob.glob('EIRTFv2_results/NewC3K/*0.000*h5')
+    #eirtfv2_c3k0_001 = glob.glob('EIRTFv2_results/NewC3K/*0.001*h5')
+    #eirtfv2_c3k0_010 = glob.glob('EIRTFv2_results/NewC3K/*0.010*h5')
+
+    eirtfv2_c3k0_000 = glob.glob('EIRTFv2_results/OldCKC/*0.000*h5')
+    eirtfv2_c3k0_001 = glob.glob('EIRTFv2_results/OldCKC/*0.001*h5')
+    eirtfv2_c3k0_010 = glob.glob('EIRTFv2_results/OldCKC/*0.010*h5')
 
     cumulative_all([eirtfv2_c3k0_000, eirtfv2_c3k0_001, eirtfv2_c3k0_010])
 

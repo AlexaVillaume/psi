@@ -147,12 +147,12 @@ def loo(regime='Warm Giants', outroot=None, nbox=-1, plotspec=True, **kwargs):
         # plot full SED
         filename = '{}_sed.pdf'.format(outroot)
         fstat = specpages(filename, wave, predicted, observed, obs_unc, labels,
-                          c3k_model=c3k_model, inbounds=inbounds, inhull=inhull,
+                          c3k_model=None, inbounds=inbounds, inhull=inhull,
                           showlines={'Full SED': (0.37, 2.5)}, show_native=False)
         # plot zoom-ins around individual lines
         filename = '{}_lines.pdf'.format(outroot)
         lstat = specpages(filename, wave, predicted, observed, obs_unc, labels,
-                          c3k_model=c3k_model, inbounds=inbounds, inhull=inhull,
+                          c3k_model=None, inbounds=inbounds, inhull=inhull,
                           showlines=showlines, show_native=True)
 
     print('finished training and plotting in {:.1f}'.format(time.time()-ts))
@@ -167,9 +167,10 @@ def run_matrix(**run_params):
     regimes = ['Hot Stars', 'Warm Giants', 'Warm Dwarfs', 'Cool Giants', 'Cool Dwarfs']
     fake_weights = [ False]
     c3k_weight = [1e-9, 1e-3, 1e-2]
+    #c3k_weight =[1e-3]
 
     for regime, wght, fake_unc in product(regimes, c3k_weight, fake_weights):
-        outroot = 'EIRTFv2_results/newfehbounds_{}_unc={}_cwght={:04.3f}'.format(regime.replace(' ','_'),
+        outroot = 'EIRTFv2_results/NewC3K/{}_unc={}_cwght={:04.3f}'.format(regime.replace(' ','_'),
                                                     not fake_unc, wght)
         _ = loo(regime=regime, c3k_weight=wght, fake_weights=fake_unc, outroot=outroot, **run_params)
 
@@ -187,14 +188,15 @@ if __name__ == "__main__":
                   'snr_max': 300,
                   'mask_mann': False,
                   #'mlib': '/Users/alexawork/Documents/PSITables/culled_libvtest_w_mdwarfs_w_unc_w_allc3k.h5',
-                  'mlib': '/Users/alexawork/Documents/StellarLibraryDB/eirtf_v2_w_mdwarfs_w_unc_w_allc3k.h5',
+                  'mlib': '/Users/alexawork/Documents/StellarLibraryDB/eirtf_v2_w_mdwarfs_w_unc_w_allc3k_v1.3_R10K.h5',
+                  #'mlib': '/Users/alexawork/Documents/StellarLibraryDB/eirtf_v2_w_mdwarfs_w_unc_w_allckc+dMall_miles+irtf.forpsi.h5',
                   'snr_threshold': 1e-10,
                   'nbox': -1,
                   }
 
     if test:
         print('Test mode')
-        psi, inds, pred = loo(regime='Warm Dwarfs', c3k_weight=1e-3, fake_weights=False,
+        psi, inds, pred = loo(regime='Cool Giants', c3k_weight=1e-2, fake_weights=False,
                               outroot=None, **run_params)
     else:
         run_matrix(**run_params)
